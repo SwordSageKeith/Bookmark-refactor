@@ -33,13 +33,12 @@ bookmarkRouter.route('/')
   }
 
   const newBook = {id: uuid(), title, url}
-  //bookmarks.push(newBook);
+ bookmarkService.insert(db, newBook)
+  .then(data => {
+    return res.status(201).json(data);
+  });
   logger.info('made new book')
-  res 
-    .status(201)
-    .send(newBook.id)
-
-})
+});
 
 bookmarkRouter.route('/:id')
 .get((req, res) => {
@@ -56,19 +55,11 @@ bookmarkRouter.route('/:id')
 })
 .delete((req, res) => {
   id = req.params.id;
-  for (let i=0; i<bookmarks.length; i++) {
-    if (bookmarks[i].id === id) {
-      //bookmarks.splice(i, 1)
-      logger.info('deleted item with id '+id)
-      return res
-        .status(202)
-        .send('successfully deleted')
-    }
-  }
-  logger.error('no book with provided id')
-  return res
-    .status(400)
-    .send('No book with that ID, cannnot delete it')
-})
+
+  bookmarkService.deleteByID(db, id)
+  .then(data => {
+    return res.status(202).send('deleted');
+  });
+});
 
 module.exports = bookmarkRouter;
